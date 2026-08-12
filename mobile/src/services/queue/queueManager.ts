@@ -1,6 +1,6 @@
 import type { QueueErrorCode, QueueJob } from '../../types/queue';
 
-export type ConvertRunner = (
+type ConvertRunner = (
   job: QueueJob,
   onProgress: (fraction: number) => void,
 ) => Promise<void>;
@@ -17,7 +17,7 @@ function generateId(): string {
   return `${Date.now().toString(36)}-${(idCounter++).toString(36)}`;
 }
 
-export interface QueueManagerOptions {
+interface QueueManagerOptions {
   maxAttempts?: number;
 }
 

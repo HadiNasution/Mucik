@@ -5,14 +5,14 @@ import { parseYoutubeUrl } from '../services/youtube/urlParser';
 import { listPlaylist } from '../services/youtube/youtubeClient';
 import type { QueueJob } from '../types/queue';
 
-export const queueManager = new QueueManager(runConversionJob);
+const queueManager = new QueueManager(runConversionJob);
 
-export interface ResolveResult {
+interface ResolveResult {
   type: 'video' | 'playlist';
   entries: QueueJobEntry[];
 }
 
-export type ResolveOutcome =
+type ResolveOutcome =
   | { ok: true; result: ResolveResult }
   | { ok: false; error: string };
 

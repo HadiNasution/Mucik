@@ -40,18 +40,15 @@ export function songToTrack(song: Song): Track {
   };
 }
 
-export async function playQueue(tracks: Track[], index: number): Promise<void> {
-  await TrackPlayer.reset();
-  await TrackPlayer.add(tracks);
-  await TrackPlayer.skip(index);
-  await TrackPlayer.play();
-}
-
-export async function rebuildQueue(
+export async function setQueue(
   tracks: Track[],
   startIndex: number,
+  autoplay: boolean,
 ): Promise<void> {
   await TrackPlayer.reset();
   await TrackPlayer.add(tracks);
   await TrackPlayer.skip(startIndex);
+  if (autoplay) {
+    await TrackPlayer.play();
+  }
 }

@@ -1,6 +1,9 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  BottomTabBar,
+  type BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LibraryScreen } from '../screens/LibraryScreen';
@@ -19,25 +22,23 @@ const SCREEN_OPTIONS = {
   tabBarInactiveTintColor: '#9a9aa0',
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121216',
-  },
-});
+function PlayerTabBar(props: BottomTabBarProps) {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  return (
+    <>
+      <PlayerBar onOpen={() => navigation.navigate('Player')} />
+      <BottomTabBar {...props} />
+    </>
+  );
+}
 
 export function TabNavigator() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
   return (
-    <View style={styles.container}>
-      <Tab.Navigator screenOptions={SCREEN_OPTIONS}>
-        <Tab.Screen name="Library" component={LibraryScreen} />
-        <Tab.Screen name="Playlists" component={PlaylistsScreen} />
-        <Tab.Screen name="Convert" component={SearchConvertScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
-      </Tab.Navigator>
-      <PlayerBar onOpen={() => navigation.navigate('Player')} />
-    </View>
+    <Tab.Navigator screenOptions={SCREEN_OPTIONS} tabBar={PlayerTabBar}>
+      <Tab.Screen name="Library" component={LibraryScreen} />
+      <Tab.Screen name="Playlists" component={PlaylistsScreen} />
+      <Tab.Screen name="Convert" component={SearchConvertScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
   );
 }

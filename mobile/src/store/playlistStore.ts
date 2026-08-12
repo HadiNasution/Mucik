@@ -14,7 +14,7 @@ interface PlaylistState {
   reorder: (playlistId: number, songIds: number[]) => Promise<void>;
 }
 
-export const usePlaylistStore = create<PlaylistState>((set, get) => ({
+export const usePlaylistStore = create<PlaylistState>(set => ({
   playlists: [],
   playlistSongIds: {},
 

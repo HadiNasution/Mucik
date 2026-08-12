@@ -1,10 +1,6 @@
 import { create } from 'zustand';
 import TrackPlayer, { RepeatMode } from 'react-native-track-player';
-import {
-  playQueue,
-  rebuildQueue,
-  songToTrack,
-} from '../services/playback/playbackService';
+import { setQueue, songToTrack } from '../services/playback/playbackService';
 import type { Song } from '../types/song';
 
 interface PlayerState {
@@ -53,7 +49,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
   play: async (songs, startIndex) => {
     const ordered = orderSongs(songs, startIndex, get().shuffleOn);
-    await playQueue(ordered.map(songToTrack), 0);
+    await setQueue(ordered.map(songToTrack), 0, true);
     set({
       currentSongId: ordered[0]?.id ?? null,
       isPlaying: true,
@@ -79,7 +75,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     const currentIndex = baseOrder.indexOf(currentSongId ?? -1);
     const ordered = orderSongs(baseSongs, Math.max(0, currentIndex), nextShuffle);
     const startIndex = ordered.findIndex(s => s.id === currentSongId);
-    await rebuildQueue(ordered.map(songToTrack), Math.max(0, startIndex));
+    await setQueue(ordered.map(songToTrack), Math.max(0, startIndex), false);
     set({
       shuffleOn: nextShuffle,
       queueSongIds: ordered.map(s => s.id),

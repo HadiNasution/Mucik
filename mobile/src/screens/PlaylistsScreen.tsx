@@ -13,7 +13,6 @@ import { usePlaylistStore } from '../store/playlistStore';
 import { useLibraryStore, groupByAlbum, groupByArtist } from '../store/libraryStore';
 import { usePlayerStore } from '../store/playerStore';
 import { PromptModal } from '../components/PromptModal';
-import { SongListItem } from '../components/SongListItem';
 import type { RootStackParamList } from '../navigation/types';
 import type { Song } from '../types/song';
 
@@ -52,7 +51,6 @@ export function PlaylistsScreen() {
   const createPlaylist = usePlaylistStore(s => s.createPlaylist);
   const songs = useLibraryStore(s => s.songs);
   const play = usePlayerStore(s => s.play);
-  const currentSongId = usePlayerStore(s => s.currentSongId);
 
   useEffect(() => {
     void loadPlaylists();

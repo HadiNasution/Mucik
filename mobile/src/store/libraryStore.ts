@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { songRepository } from '../db/repositories/songRepository';
 import type { Song, SongFields } from '../types/song';
 
-export interface SongGroup {
+interface SongGroup {
   key: string;
   songs: Song[];
 }

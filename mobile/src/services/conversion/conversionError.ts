@@ -23,7 +23,7 @@ export function toConversionError(error: unknown): ConversionError {
     return new ConversionError('VIDEO_UNAVAILABLE', 'Video is unavailable');
   }
   if (
-    /network|sock|timeout|ECONN|ETIMEDOUT|fetch|download failed|status 4/i.test(
+    /network|sock|timeout|timed out|ECONN|ETIMEDOUT|fetch|download failed|status 4/i.test(
       message,
     )
   ) {

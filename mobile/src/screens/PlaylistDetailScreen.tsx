@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   FlatList,
   Modal,
@@ -22,14 +22,19 @@ export function PlaylistDetailScreen({ route }: Props) {
   const insets = useSafeAreaInsets();
   const { playlistId, playlistName } = route.params;
   const [addVisible, setAddVisible] = useState(false);
+  const [reorderVisible, setReorderVisible] = useState(false);
   const songs = useLibraryStore(s => s.songs);
   const playlistSongIds = usePlaylistStore(s => s.playlistSongIds);
   const removeSong = usePlaylistStore(s => s.removeSong);
   const addSong = usePlaylistStore(s => s.addSong);
+  const reorder = usePlaylistStore(s => s.reorder);
   const play = usePlayerStore(s => s.play);
   const currentSongId = usePlayerStore(s => s.currentSongId);
 
-  const songIds = playlistSongIds[playlistId] ?? [];
+  const songIds = useMemo(
+    () => playlistSongIds[playlistId] ?? [],
+    [playlistSongIds, playlistId],
+  );
   const playlistSongs = useMemo(() => {
     const map = new Map(songs.map(s => [s.id, s]));
     return songIds.map(id => map.get(id)).filter((s): s is Song => !!s);
@@ -39,6 +44,17 @@ export function PlaylistDetailScreen({ route }: Props) {
     () => songs.filter(s => !songIds.includes(s.id)),
     [songs, songIds],
   );
+
+  const move = (index: number, delta: number) => {
+    const next = [...songIds];
+    const target = index + delta;
+    if (target < 0 || target >= next.length) {
+      return;
+    }
+    const [moved] = next.splice(index, 1);
+    next.splice(target, 0, moved);
+    void reorder(playlistId, next);
+  };
 
   const playList = () => {
     if (playlistSongs.length > 0) {
@@ -58,6 +74,11 @@ export function PlaylistDetailScreen({ route }: Props) {
           onPress={() => setAddVisible(true)}>
           <Text style={styles.actionText}>Add songs</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionButton, reorderVisible && styles.actionButtonActive]}
+          onPress={() => setReorderVisible(v => !v)}>
+          <Text style={styles.actionText}>Reorder</Text>
+        </TouchableOpacity>
       </View>
       <FlatList
         data={playlistSongs}
@@ -66,12 +87,46 @@ export function PlaylistDetailScreen({ route }: Props) {
           <Text style={styles.empty}>Playlist is empty.</Text>
         }
         renderItem={({ item, index }) => (
-          <SongListItem
-            song={item}
-            isCurrent={item.id === currentSongId}
-            onPress={() => void play(playlistSongs, index)}
-            onLongPress={() => void removeSong(playlistId, item.id)}
-          />
+          <View style={styles.row}>
+            {reorderVisible && (
+              <View style={styles.reorderControls}>
+                <TouchableOpacity
+                  disabled={index === 0}
+                  onPress={() => move(index, -1)}
+                  style={styles.reorderButton}>
+                  <Text style={[styles.reorderIcon, index === 0 && styles.reorderDisabled]}>
+                    ▲
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  disabled={index === playlistSongs.length - 1}
+                  onPress={() => move(index, 1)}
+                  style={styles.reorderButton}>
+                  <Text
+                    style={[
+                      styles.reorderIcon,
+                      index === playlistSongs.length - 1 && styles.reorderDisabled,
+                    ]}>
+                    ▼
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <SongListItem
+              song={item}
+              isCurrent={item.id === currentSongId}
+              onPress={() => {
+                if (!reorderVisible) {
+                  void play(playlistSongs, index);
+                }
+              }}
+              onLongPress={() => {
+                if (!reorderVisible) {
+                  void removeSong(playlistId, item.id);
+                }
+              }}
+            />
+          </View>
         )}
       />
 
@@ -82,7 +137,7 @@ export function PlaylistDetailScreen({ route }: Props) {
               <Text style={styles.cancelText}>Done</Text>
             </TouchableOpacity>
             <Text style={styles.header}>Add Songs</Text>
-            <View style={{ width: 44 }} />
+            <View style={styles.spacer} />
           </View>
           <FlatList
             data={addableSongs}
@@ -128,10 +183,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
+  actionButtonActive: {
+    backgroundColor: '#2a6bbd',
+  },
   actionText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reorderControls: {
+    paddingLeft: 12,
+    gap: 4,
+  },
+  reorderButton: {
+    padding: 4,
+  },
+  reorderIcon: {
+    color: '#4da3ff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  reorderDisabled: {
+    color: '#3a3a40',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -142,6 +219,9 @@ const styles = StyleSheet.create({
     color: '#4da3ff',
     fontSize: 16,
     paddingHorizontal: 16,
+  },
+  spacer: {
+    width: 44,
   },
   empty: {
     color: '#9a9aa0',

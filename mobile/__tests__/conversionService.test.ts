@@ -13,8 +13,6 @@ jest.mock('../src/services/storage/storageService', () => ({
   storageService: {
     ensureReady: jest.fn().mockResolvedValue(undefined),
     getCacheDir: jest.fn(() => '/cache'),
-    getSongsDir: jest.fn(() => '/songs'),
-    getArtworkDir: jest.fn(() => '/artwork'),
     getSongPath: jest.fn(videoId => `/songs/${videoId}.mp3`),
     getArtworkPath: jest.fn(videoId => `/artwork/${videoId}.jpg`),
     getFreeSpace: jest.fn().mockResolvedValue(1024 * 1024 * 1024),

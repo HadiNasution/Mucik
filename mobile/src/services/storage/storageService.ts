@@ -10,14 +10,6 @@ async function ensureDirs(): Promise<void> {
 }
 
 export const storageService = {
-  getSongsDir(): string {
-    return SONGS_DIR;
-  },
-
-  getArtworkDir(): string {
-    return ARTWORK_DIR;
-  },
-
   getCacheDir(): string {
     return CACHE_DIR;
   },
@@ -37,10 +29,6 @@ export const storageService = {
   async getFreeSpace(): Promise<number> {
     const info = await RNFS.getFSInfo();
     return info.freeSpace;
-  },
-
-  async fileExists(path: string): Promise<boolean> {
-    return RNFS.exists(path);
   },
 
   async deleteFile(path: string): Promise<void> {

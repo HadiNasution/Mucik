@@ -64,19 +64,6 @@ export const songRepository = {
     return mapRow(asSongRow(result.rows[0]));
   },
 
-  async findByIds(ids: number[]): Promise<Song[]> {
-    if (ids.length === 0) {
-      return [];
-    }
-    const db = await getDatabase();
-    const placeholders = ids.map(() => '?').join(', ');
-    const result = await db.execute(
-      `SELECT * FROM songs WHERE id IN (${placeholders})`,
-      ids,
-    );
-    return result.rows.map(row => mapRow(asSongRow(row)));
-  },
-
   async insert(input: SongInput): Promise<Song> {
     const db = await getDatabase();
     const createdAt = Date.now();
@@ -142,11 +129,5 @@ export const songRepository = {
     const db = await getDatabase();
     await db.execute('DELETE FROM songs WHERE id = ?', [id]);
     await db.execute('DELETE FROM playlist_songs WHERE song_id = ?', [id]);
-  },
-
-  async count(): Promise<number> {
-    const db = await getDatabase();
-    const result = await db.execute('SELECT COUNT(*) AS c FROM songs');
-    return result.rows[0].c as number;
   },
 };
